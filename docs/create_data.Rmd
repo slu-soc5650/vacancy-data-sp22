@@ -1,0 +1,50 @@
+---
+title: "Create 2022 Data - Vacancy"
+author: "Christopher Prener, Ph.D."
+date: '(`r format(Sys.time(), "%B %d, %Y")`)'
+output: 
+  github_document: default
+  html_notebook: default 
+---
+
+## Introduction
+This notebook creates the vacancy data for the Spring 2022 final projects.
+
+## Dependencies
+This notebook requires:
+
+```{r load-packages, message = FALSE}
+# tidyverse packages
+library(dplyr)
+library(readr)
+
+# spatial packages
+library(sf)
+
+# other packages
+library(here)
+```
+
+## Raw Data
+This notebook requires data that can be automatically downloaded from the [Vacancy Collaborative's](https://www.stlvacancytools.com) open data portal:
+
+```{r download-data}
+vacant <- read_csv("https://www.publicgoodness.org/stlv/csv/stl_vacancy_data.csv",
+                   col_types = cols(Handle = col_character()))
+```
+
+## Subset
+There are some variables that we'll get rid of before exporting the data:
+
+```{r subset-cols}
+vacant %>% 
+  select(-c("Ward20", "Ward10", "NhdName", "CensTract20", "CensTract10")) %>%
+  relocate(Lat, Lng, .after = last_col()) -> vacant
+```
+
+## Write Data
+Finally, we'll write the data to `.csv`:
+
+```{r write-data}
+write_csv(vacant, here("data", "vacant.csv"))
+```
